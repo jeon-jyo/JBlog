@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="blog">
+
+	<resultMap id="UserMap" type="com.javaex.vo.UserVo">
+		<result column="userNo" property="userNo"></result>
+		<result column="id" property="id"></result>
+		<result column="userName" property="userName"></result>
+		<result column="password" property="password"></result>
+		<result column="joinDate" property="joinDate"></result>
+	</resultMap>
+	
+	<resultMap id="BlogMap" type="com.javaex.vo.BlogVo">
+		<result column="blogTitle" property="blogTitle"></result>
+		<result column="logoFile" property="logoFile"></result>
+		<collection property="id" resultMap="UserMap"></collection>
+	</resultMap>
+	
+	<!-- 블로그 생성 -->
+	<insert id="blogInsert" parameterType="com.javaex.vo.BlogVo">
+		<![CDATA[
+			INSERT INTO blog (id, blogTitle)
+			VALUES (#{id.id}, #{blogTitle})
+		]]>
+	</insert>
+	
+	<!-- 블로그 메인 -->
+	<select id="blogDetail" parameterType="String" resultMap="BlogMap">
+		<![CDATA[
+			SELECT u.userNo
+			       ,u.userName
+			       ,u.id
+			       ,b.blogTitle
+			       ,b.logoFile
+			  FROM users u, blog b
+			 WHERE u.id = b.id
+			   AND u.id = #{id}
+		]]>
+	</select>
+	
+</mapper>
