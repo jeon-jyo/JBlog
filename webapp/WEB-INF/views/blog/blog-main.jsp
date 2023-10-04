@@ -18,13 +18,18 @@
 		<div id="content" class="clearfix">
 			<div id="profilecate_area">
 				<div id="profile">
-					<!-- 기본이미지 -->
-					<img id="proImg" src="${pageContext.request.contextPath}/assets/images/spring-logo.jpg">
+					<c:if test="${empty blogVo.logoFile }">
+						<!-- 기본이미지 -->
+						하이
+						<img id="proImg" src="${pageContext.request.contextPath}/assets/images/sarang_profile.jpg">
+					</c:if>
+					<c:if test="${!empty blogVo.logoFile }">
+						<!-- 사용자업로드 이미지 -->
+						안녕
+						<img id="proImg" src="">
+					</c:if>
 					
-					<!-- 사용자업로드 이미지 -->
-					<%-- <img id="proImg" src=""> --%>
-					
-					<div id="nick">정우성(hijava)님</div>
+					<div id="nick">${blogVo.id.userName }(${blogVo.id.id })님</div>
 				</div>
 				<div id="cate">
 					<div class="text-left">
@@ -46,7 +51,7 @@
 				<div id="postBox" class="clearfix">
 					<div id="postTitle" class="text-left"><strong>08.페이징</strong></div>
 					<div id="postDate" class="text-left"><strong>2020/07/23</strong></div>
-					<div id="postNick">정우성(hijava)님</div>
+					<div id="postNick">${blogVo.id.userName }(${blogVo.id.id })님</div>
 				</div>
 				<!-- //postBox -->
 			

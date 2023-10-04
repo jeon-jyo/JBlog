@@ -81,6 +81,7 @@ a:hover	  {text-decoration: none; color: #000000; }
 
 /* 메인-해더 */
 #center-content .logo			{width: 163px; height: 104px; margin: 50px auto 0px auto; }
+#center-content .logo			{width: 250px; height: 250px; margin: 50px auto 0px auto; }
 #center-content .menu			{width: 160px; height: 20px; margin: 0 auto 50px auto; text-align:center; }
 #center-content .menu li		{width: 80px; margin: 0px 0px 0px 0px; float: left; }
 
@@ -141,7 +142,7 @@ div#footer		{color:#666; }
 
 /* 개인블로그 레이아웃 */
 #wrap 								{width: 1000px; margin: 0px auto;}
-#wrap #header 						{height: 90px; margin: 0px 0px 10px 0px; padding: 30px 10px 10px 10px; background-color: darkolivegreen; }
+#wrap #header 						{height: 90px; margin: 0px 0px 10px 0px; padding: 30px 10px 10px 10px; background-color: #808080; }
 
 #wrap #content						{margin: 0px 0px 30px 0px; background-color: #ffffff; }
 #wrap #content #profilecate_area	{width: 190px; float:left; margin: 0px 10px 0px 0px; background-color: #ffffff; }
