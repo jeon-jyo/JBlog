@@ -57,6 +57,6 @@
 	</bean>
 	
 	<!-- url매핑 -->
-	<mvc:resources mapping="/upload/**" location="C:\Jiho\HiMedia\JavaStudy\jBlogUpload\" />
+	<mvc:resources mapping="/upload/**" location="file:C:\Jiho\HiMedia\JavaStudy\jBlogUpload\" />
 
 </beans>

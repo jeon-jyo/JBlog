@@ -39,4 +39,16 @@
 		]]>
 	</select>
 	
+	<!-- 블로그 관리 -->
+	
+	<!-- 블로그 관리 - 기본 수정 -->
+	<update id="basicUpdate" parameterType="com.javaex.vo.BlogVo">
+		<![CDATA[
+			UPDATE blog
+			   SET blogTitle = #{blogTitle}
+			       ,logoFile = #{logoFile}
+			 WHERE id = #{id.id}
+		]]>
+	</update>
+	
 </mapper>

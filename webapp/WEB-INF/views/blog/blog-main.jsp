@@ -20,13 +20,11 @@
 				<div id="profile">
 					<c:if test="${empty blogVo.logoFile }">
 						<!-- 기본이미지 -->
-						하이
-						<img id="proImg" src="${pageContext.request.contextPath}/assets/images/sarang_profile.jpg">
+						<img id="proImg" src="${pageContext.request.contextPath }/assets/images/sarang_profile.jpg">
 					</c:if>
 					<c:if test="${!empty blogVo.logoFile }">
 						<!-- 사용자업로드 이미지 -->
-						안녕
-						<img id="proImg" src="">
+						<img id="proImg" src="${pageContext.request.contextPath }/upload/${blogVo.logoFile }">
 					</c:if>
 					
 					<div id="nick">${blogVo.id.userName }(${blogVo.id.id })님</div>

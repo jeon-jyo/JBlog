@@ -22,7 +22,7 @@
 			<!-- //admin-menu -->
 			
 			<div id="admin-content">
-				<form action="" method="post" >
+				<form action="${pageContext.request.contextPath}/admin/basicUpdate" method="post" enctype="multipart/form-data">
 	 		      	<table id="admin-basic">
 	 		      		<colgroup>
 							<col style="width: 100px;">
@@ -37,19 +37,17 @@
 			      			<td class="text-left">
 			      			<c:if test="${empty blogVo.logoFile }">
 								<!-- 기본이미지 -->
-								하이
-								<img src="${pageContext.request.contextPath}/assets/images/sarang_profile.jpg">
+								<img src="${pageContext.request.contextPath }/assets/images/sarang_profile.jpg">
 							</c:if>
 							<c:if test="${!empty blogVo.logoFile }">
 								<!-- 사용자업로드 이미지 -->
-								안녕
-								<img src="">
+								<img src="${pageContext.request.contextPath }/upload/${blogVo.logoFile }">
 							</c:if>
 			      			</td>   
 			      		</tr>      		
 			      		<tr>
 			      			<td>&nbsp;</td>
-			      			<td><input id="textLogo" type="file" name="file"></td>      			
+			      			<td><input id="textLogo" type="file" name="file" value=""></td>
 			      		</tr>           		
 			      	</table>
 			      	<div id="btnArea">

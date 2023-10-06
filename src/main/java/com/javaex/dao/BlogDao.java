@@ -29,5 +29,16 @@ public class BlogDao {
 		
 		return blogVo;
 	}
+
+	// ----- 블로그 관리 ------------------------------
+	
+	// 블로그 관리 - 기본 수정
+	public int basicUpdate(BlogVo blogVo) {
+		System.out.println("BlogDao.basicUpdate()");
+		
+		int count = sqlSession.update("blog.basicUpdate", blogVo);
+		
+		return count;
+	}
 	
 }
