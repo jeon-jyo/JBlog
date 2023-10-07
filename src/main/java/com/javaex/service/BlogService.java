@@ -91,27 +91,20 @@ public class BlogService {
 			}
 		}
 	}
-
-	// 블로그 관리 - 카테고리 리스트 ajax
-	public List<CategoryVo> categoryList(String id) {
+	
+	// 블로그 관리 - 카테고리 리스트 + 포스트 수 ajax
+	public List<Map<String, Object>> categoryList(String id) {
 		System.out.println("BlogService.categoryList()");
 		
-		List<CategoryVo> categoryList = blogDao.categoryList(id);
-		
-		return categoryList;
-	}
-	
-	// 블로그 관리 - 카테고리 리스트 ajax + 포스트 수
-	public List<Map<String, Object>> categoryMapList(String id) {
-		System.out.println("BlogService.categoryMapList()");
-		
-		List<Map<String, Object>> cateMapList = blogDao.categoryMapList(id);
+		List<Map<String, Object>> cateMapList = blogDao.categoryList(id);
+		// System.out.println("cateMapList : " + cateMapList);
+		System.out.println("cateMapList.size() : " + cateMapList.size());
 		
 		return cateMapList;
 	}
-
+	
 	// 블로그 관리 - 카테고리 추가 ajax
-	public CategoryVo categoryAdd(CategoryVo categoryVo) {
+	public Map<String, Object> categoryAdd(CategoryVo categoryVo) {
 		System.out.println("BlogService.categoryAdd()");
 		
 		int count = blogDao.selectKey(categoryVo);
@@ -120,9 +113,9 @@ public class BlogService {
 			
 			// 카테고리 정보
 			int cateNo = categoryVo.getCateNo();
-			CategoryVo vo = blogDao.selectCategory(cateNo);
+			Map<String, Object> cateMap = blogDao.selectCategory(cateNo);
 			
-			return vo;
+			return cateMap;
 		} else {
 			System.out.println("등록 실패");
 			

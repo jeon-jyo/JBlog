@@ -44,21 +44,12 @@ public class BlogDao {
 		
 		return count;
 	}
-
-	// 블로그 관리 - 카테고리 리스트 ajax
-	public List<CategoryVo> categoryList(String id) {
+	
+	// 블로그 관리 - 카테고리 리스트 + 포스트 수 ajax
+	public List<Map<String, Object>> categoryList(String id) {
 		System.out.println("BlogDao.categoryList()");
 		
-		List<CategoryVo> categoryList = sqlSession.selectList("blog.categoryList", id);
-		
-		return categoryList;
-	}
-	
-	// 블로그 관리 - 카테고리 리스트 ajax + 포스트 수
-	public List<Map<String, Object>> categoryMapList(String id) {
-		System.out.println("BlogDao.categoryMapList()");
-		
-		List<Map<String, Object>> cateMapList = sqlSession.selectList("blog.categoryMapList", id);
+		List<Map<String, Object>> cateMapList = sqlSession.selectList("blog.categoryList", id);
 		
 		return cateMapList;
 	}
@@ -73,12 +64,12 @@ public class BlogDao {
 	}
 	
 	// 카테고리 정보
-	public CategoryVo selectCategory(int cateNo) {
+	public Map<String, Object> selectCategory(int cateNo) {
 		System.out.println("BlogDao.selectCategory()");
 		
-		CategoryVo categoryVo = sqlSession.selectOne("blog.selectCategory", cateNo);
+		Map<String, Object> cateMap = sqlSession.selectOne("blog.selectCategory", cateNo);
 		
-		return categoryVo;
+		return cateMap;
 	}
 
 	// 블로그 관리 - 카테고리 삭제 ajax

@@ -93,29 +93,14 @@ public class BlogController {
 		return "blog/admin/blog-admin-cate";
 	}
 	
-	// 블로그 관리 - 카테고리 리스트 ajax
+	// 블로그 관리 - 카테고리 리스트 + 포스트 수 ajax
 	@ResponseBody
 	@RequestMapping(value="/{id}/admin/categoryList", method= { RequestMethod.GET, RequestMethod.POST})
 	public JsonResultVo adminCategoryList(@PathVariable(value="id") String id) {
 		System.out.println("BlogController.adminCategoryList()");
 		System.out.println("id : " + id);
 		
-		List<CategoryVo> categoryList = blogService.categoryList(id);
-		
-		JsonResultVo jsonResultVo = new JsonResultVo();
-		jsonResultVo.success(categoryList);
-		
-		return jsonResultVo;
-	}
-	
-	// 블로그 관리 - 카테고리 리스트 ajax + 포스트 수
-	@ResponseBody
-	@RequestMapping(value="/{id}/admin/categoryMapList", method= { RequestMethod.GET, RequestMethod.POST})
-	public JsonResultVo adminCategoryMapList(@PathVariable(value="id") String id) {
-		System.out.println("BlogController.adminCategoryMapList()");
-		System.out.println("id : " + id);
-		
-		List<Map<String, Object>> cateMapList = blogService.categoryMapList(id);
+		List<Map<String, Object>> cateMapList = blogService.categoryList(id);
 		
 		JsonResultVo jsonResultVo = new JsonResultVo();
 		jsonResultVo.success(cateMapList);
@@ -133,12 +118,13 @@ public class BlogController {
 		BlogVo blogVo = new BlogVo();
 		blogVo.setId(authUser);
 		categoryVo.setId(blogVo);
+		System.out.println("categoryVo : " + categoryVo);
 		
-		CategoryVo vo = blogService.categoryAdd(categoryVo);
+		Map<String, Object> cateMap = blogService.categoryAdd(categoryVo);
 		
 		JsonResultVo jsonResultVo = new JsonResultVo();
-		if(vo != null) {
-			jsonResultVo.success(vo);
+		if(cateMap != null) {
+			jsonResultVo.success(cateMap);
 			
 			return jsonResultVo;
 		} else {

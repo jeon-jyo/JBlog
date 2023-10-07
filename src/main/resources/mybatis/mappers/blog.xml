@@ -65,21 +65,8 @@
 		]]>
 	</update>
 
-	<!-- 블로그 관리 - 카테고리 리스트 ajax -->
-	<select id="categoryList" parameterType="String" resultMap="CategoryMap">
-		<![CDATA[
-			SELECT cateNo
-			       ,id
-			       ,cateName
-			       ,description
-			  FROM category
-			 WHERE id = #{id}
-			 ORDER BY cateNo DESC
-		]]>
-	</select>
-	
-	<!-- 블로그 관리 - 카테고리 리스트 ajax + 포스트 수 -->
-	<select id="categoryMapList" parameterType="String" resultMap="CategoryPostMap">
+	<!-- 블로그 관리 - 카테고리 리스트 + 포스트 수 ajax -->
+	<select id="categoryList" parameterType="String" resultMap="CategoryPostMap">
 		<![CDATA[
 			SELECT ROWNUM rn
 			       ,ot.cateNo
@@ -106,7 +93,6 @@
 	</select>
 	
 	<!-- 블로그 관리 - 카테고리 추가 ajax -->
-	<!-- 번호를 미리 받고 insert -->
 	<insert id="selectKey" parameterType="com.javaex.vo.CategoryVo">
 		<selectKey keyProperty="cateNo" resultType="int" order="BEFORE">	
 			select seq_category_no.NEXTVAL from dual
@@ -118,14 +104,18 @@
 	</insert>
 	
 	<!-- 카테고리 정보 -->
-	<select id="selectCategory" parameterType="int" resultMap="CategoryMap">
+	<select id="selectCategory" parameterType="int" resultMap="CategoryPostMap">
 		<![CDATA[
-			SELECT cateNo
-			       ,id
-			       ,cateName
-			       ,description
-			  FROM category
-			 WHERE cateNo = #{cateNo}
+			SELECT ot.cnt rn
+			       ,c.cateNo
+			       ,c.id
+			       ,c.cateName
+			       ,c.description
+			       ,NVL(NULL, 0) postCnt
+			  FROM category c, (SELECT count(cateNo) cnt
+			                     FROM category
+			                   ) ot
+			 WHERE c.cateNo = #{cateNo}
 		]]>
 	</select>
 	

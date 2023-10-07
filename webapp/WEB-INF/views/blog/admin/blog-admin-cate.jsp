@@ -56,6 +56,7 @@
 		      	</table> 
 			
 				<div id="btnArea">
+					<input type="hidden" name="hiddenCnt" value="0">
 		      		<button id="btnAddCate" class="btn_l" type="submit">카테고리추가</button>
 		      	</div>
 			</div>
@@ -123,7 +124,7 @@
 		console.log("cateList btnCateDel");
 		
 		let $this = $(this);
-		let cateNo = $this.data("no");
+		let cateNo = $this.data("cateno");
 		let postNo = $this.data("postno");
 		
 		if(postNo != 0) {
@@ -157,52 +158,29 @@
 	function fetchList() {
 		console.log("fetchList()");
 		
-		let list = window.prompt("1 or 2");
-		console.log("list : " + list);
-		if(list == 1) {
-			$.ajax({
-				url : "${pageContext.request.contextPath}/${authUser.id}/admin/categoryList",
-				type : "get",
+		$.ajax({
+			url : "${pageContext.request.contextPath}/${authUser.id}/admin/categoryList",
+			type : "get",
 
-				dataType : "json",
-				success : function(jsonResult) {
-					if(jsonResult.result  == "success") {
-						console.log("success");
-						
-						for(let i = 0; i < jsonResult.data.length; i++) {
-							render(jsonResult.data[i], "down");
-						}
+			dataType : "json",
+			success : function(jsonResult) {
+				if(jsonResult.result  == "success") {
+					console.log("success");
+					
+					for(let i = 0; i < jsonResult.data.length; i++) {
+						render(jsonResult.data[i], "down");
 					}
-				},
-				error : function(XHR, status, error) {
-					console.error(status + " : " + error);
 				}
-			});
-		} else {
-			$.ajax({
-				url : "${pageContext.request.contextPath}/${authUser.id}/admin/categoryMapList",
-				type : "get",
-
-				dataType : "json",
-				success : function(jsonResult) {
-					if(jsonResult.result  == "success") {
-						console.log("success");
-						
-						for(let i = 0; i < jsonResult.data.length; i++) {
-							render2(jsonResult.data[i], "down");
-						}
-					}
-				},
-				error : function(XHR, status, error) {
-					console.error(status + " : " + error);
-				}
-			});
-		}
+			},
+			error : function(XHR, status, error) {
+				console.error(status + " : " + error);
+			}
+		});
 	}
 	
 	// 리스트 그리기
-	function render2(cateMap, dir) {
-		console.log("render2()");
+	function render(cateMap, dir) {
+		console.log("render()");
 		
 		let str = '';
 		str += '<tr id="t' + cateMap.categoryVo.cateNo + '">';
@@ -211,33 +189,9 @@
 		str += '	<td>' + cateMap.postCnt + '</td>';
 		str += '	<td>' + cateMap.categoryVo.description + '</td>';
 		str += '	<td class="text-center">';
-		str += '		<img class="btnCateDel" data-no="' + cateMap.categoryVo.cateNo
+		str += '		<img class="btnCateDel" data-cateno="' + cateMap.categoryVo.cateNo
 						+ '" data-postno="' + cateMap.postCnt
 						+ '" src="${pageContext.request.contextPath}/assets/images/delete.jpg"';
-		str += '	<td>';
-		str += '</tr>';
-		
-		if(dir == "up") {
-			$("#cateList").prepend(str);
-		} else if(dir == "down") {
-			$("#cateList").append(str);
-		} else {
-			console.log("잘못입력");
-		}
-	}
-
-	// 리스트 그리기
-	function render(categoryVo, dir) {
-		console.log("render()");
-		
-		let str = '';
-		str += '<tr id="t' + categoryVo.cateNo + '">';
-		str += '	<td>' + categoryVo.cateNo + '</td>';
-		str += '	<td>' + categoryVo.cateName + '</td>';
-		str += '	<td>' + '카테고리 수' + '</td>';
-		str += '	<td>' + categoryVo.description + '</td>';
-		str += '	<td class="text-center">';
-		str += '		<img class="btnCateDel" data-no="' + categoryVo.cateNo + '" src="${pageContext.request.contextPath}/assets/images/delete.jpg"';
 		str += '	<td>';
 		str += '</tr>';
 		
