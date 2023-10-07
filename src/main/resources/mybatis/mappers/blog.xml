@@ -17,6 +17,20 @@
 		<collection property="id" resultMap="UserMap"></collection>
 	</resultMap>
 	
+	<resultMap id="CategoryMap" type="com.javaex.vo.CategoryVo">
+		<result column="cateNo" property="cateNo"></result>
+		<result column="cateName" property="cateName"></result>
+		<result column="description" property="description"></result>
+		<result column="regDate" property="regDate"></result>
+		<collection property="id" resultMap="BlogMap"></collection>
+	</resultMap>
+	
+	<resultMap id="CategoryPostMap" type="java.util.Map">
+		<result column="postCnt" property="postCnt"></result>
+		<result column="rn" property="rn"></result>
+		<collection property="categoryVo" resultMap="CategoryMap"></collection>
+	</resultMap>
+	
 	<!-- 블로그 생성 -->
 	<insert id="blogInsert" parameterType="com.javaex.vo.BlogVo">
 		<![CDATA[
@@ -25,7 +39,7 @@
 		]]>
 	</insert>
 	
-	<!-- 블로그 메인 -->
+	<!-- 블로그 메인 + 블로그 관리 - 기본 -->
 	<select id="blogDetail" parameterType="String" resultMap="BlogMap">
 		<![CDATA[
 			SELECT u.userNo
@@ -50,5 +64,77 @@
 			 WHERE id = #{id.id}
 		]]>
 	</update>
+
+	<!-- 블로그 관리 - 카테고리 리스트 ajax -->
+	<select id="categoryList" parameterType="String" resultMap="CategoryMap">
+		<![CDATA[
+			SELECT cateNo
+			       ,id
+			       ,cateName
+			       ,description
+			  FROM category
+			 WHERE id = #{id}
+			 ORDER BY cateNo DESC
+		]]>
+	</select>
+	
+	<!-- 블로그 관리 - 카테고리 리스트 ajax + 포스트 수 -->
+	<select id="categoryMapList" parameterType="String" resultMap="CategoryPostMap">
+		<![CDATA[
+			SELECT ROWNUM rn
+			       ,ot.cateNo
+			       ,ot.id
+			       ,ot.cateName
+			       ,ot.description
+			       ,ot.postCnt
+			  FROM (SELECT c.cateNo
+			               ,c.id
+			               ,c.cateName
+			               ,c.description
+			               ,NVL(p.cnt, 0) postCnt
+			          FROM category c
+			          LEFT OUTER JOIN (SELECT count(postNo) cnt, cateNo
+			                             FROM post
+			                            GROUP BY cateNo
+			                          ) p
+			            ON c.cateNo = p.cateNo
+			         WHERE c.id = #{id}
+			         ORDER BY cateNo ASC
+			       ) ot
+			 ORDER BY rn DESC
+		]]>
+	</select>
+	
+	<!-- 블로그 관리 - 카테고리 추가 ajax -->
+	<!-- 번호를 미리 받고 insert -->
+	<insert id="selectKey" parameterType="com.javaex.vo.CategoryVo">
+		<selectKey keyProperty="cateNo" resultType="int" order="BEFORE">	
+			select seq_category_no.NEXTVAL from dual
+		</selectKey>
+		<![CDATA[
+			INSERT INTO category
+			VALUES (#{cateNo}, #{id.id.id}, #{cateName}, #{description}, sysdate)
+		]]>
+	</insert>
+	
+	<!-- 카테고리 정보 -->
+	<select id="selectCategory" parameterType="int" resultMap="CategoryMap">
+		<![CDATA[
+			SELECT cateNo
+			       ,id
+			       ,cateName
+			       ,description
+			  FROM category
+			 WHERE cateNo = #{cateNo}
+		]]>
+	</select>
+	
+	<!-- 블로그 관리 - 카테고리 삭제 ajax -->
+	<delete id="categoryDelete" parameterType="com.javaex.vo.CategoryVo">
+		<![CDATA[
+			DELETE FROM category
+			 WHERE cateNo = #{cateNo}
+		]]>
+	</delete>
 	
 </mapper>

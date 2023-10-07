@@ -2,12 +2,11 @@ package com.javaex.vo;
 
 public class JsonResultVo {
 
-	// 성공했을 때
 	// success, List<Vo>, null
 	// fail, null, "통신오류"
 	
 	private String result;		// 'success'	'fail'
-	private Object data;    	// 성공했을 때 data        
+	private Object data;    	// 성공했을 때 data
 	private String failMsg;		// 실패했을 때 참고할 수 있는 메시지 코드값
 	
 	public JsonResultVo() {}

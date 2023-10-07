@@ -1,5 +1,8 @@
 package com.javaex.controller;
 
+import java.util.List;
+import java.util.Map;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +13,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.javaex.service.BlogService;
 import com.javaex.vo.BlogVo;
+import com.javaex.vo.CategoryVo;
+import com.javaex.vo.JsonResultVo;
 import com.javaex.vo.UserVo;
 
 @Controller
@@ -73,4 +79,93 @@ public class BlogController {
 		
 		return "redirect:/" + authUser.getId() + "/admin/basic";
 	}
+	
+	// 블로그 관리 - 카테고리
+	@RequestMapping(value="/{id}/admin/category", method= { RequestMethod.GET, RequestMethod.POST})
+	public String adminCategory(@PathVariable(value="id") String id,  Model model) {
+		System.out.println("BlogController.adminCategory()");
+		System.out.println("id : " + id);
+		
+		BlogVo blogVo = blogService.blogDetail(id);
+		
+		model.addAttribute("blogVo", blogVo);
+		
+		return "blog/admin/blog-admin-cate";
+	}
+	
+	// 블로그 관리 - 카테고리 리스트 ajax
+	@ResponseBody
+	@RequestMapping(value="/{id}/admin/categoryList", method= { RequestMethod.GET, RequestMethod.POST})
+	public JsonResultVo adminCategoryList(@PathVariable(value="id") String id) {
+		System.out.println("BlogController.adminCategoryList()");
+		System.out.println("id : " + id);
+		
+		List<CategoryVo> categoryList = blogService.categoryList(id);
+		
+		JsonResultVo jsonResultVo = new JsonResultVo();
+		jsonResultVo.success(categoryList);
+		
+		return jsonResultVo;
+	}
+	
+	// 블로그 관리 - 카테고리 리스트 ajax + 포스트 수
+	@ResponseBody
+	@RequestMapping(value="/{id}/admin/categoryMapList", method= { RequestMethod.GET, RequestMethod.POST})
+	public JsonResultVo adminCategoryMapList(@PathVariable(value="id") String id) {
+		System.out.println("BlogController.adminCategoryMapList()");
+		System.out.println("id : " + id);
+		
+		List<Map<String, Object>> cateMapList = blogService.categoryMapList(id);
+		
+		JsonResultVo jsonResultVo = new JsonResultVo();
+		jsonResultVo.success(cateMapList);
+		
+		return jsonResultVo;
+	}
+	
+	// 블로그 관리 - 카테고리 추가 ajax
+	@ResponseBody
+	@RequestMapping(value="/admin/categoryAdd", method= { RequestMethod.GET, RequestMethod.POST})
+	public JsonResultVo adminCategoryAdd(@ModelAttribute CategoryVo categoryVo, HttpSession session) {
+		System.out.println("BlogController.adminCategoryAdd()");
+		
+		UserVo authUser = (UserVo)session.getAttribute("authUser");
+		BlogVo blogVo = new BlogVo();
+		blogVo.setId(authUser);
+		categoryVo.setId(blogVo);
+		
+		CategoryVo vo = blogService.categoryAdd(categoryVo);
+		
+		JsonResultVo jsonResultVo = new JsonResultVo();
+		if(vo != null) {
+			jsonResultVo.success(vo);
+			
+			return jsonResultVo;
+		} else {
+			jsonResultVo.fail("categoryAdd 실패");
+			
+			return jsonResultVo;
+		}
+	}
+	
+	// 블로그 관리 - 카테고리 삭제 ajax
+	@ResponseBody
+	@RequestMapping(value="/admin/categoryDelete", method= { RequestMethod.GET, RequestMethod.POST})
+	public JsonResultVo adminCategoryDelete(@ModelAttribute CategoryVo categoryVo) {
+		System.out.println("BlogController.adminCategoryDelete()");
+		
+		int count = blogService.categoryDelete(categoryVo);
+		
+		JsonResultVo jsonResultVo = new JsonResultVo();
+		if(count == 1) {
+			jsonResultVo.success("");
+			
+			return jsonResultVo;
+		} else {
+			jsonResultVo.fail("categoryDelete 실패");
+			
+			return jsonResultVo;
+		}
+	}
+
 }

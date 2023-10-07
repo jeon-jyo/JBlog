@@ -4,6 +4,8 @@ import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.javaex.dao.BlogDao;
 import com.javaex.vo.BlogVo;
+import com.javaex.vo.CategoryVo;
 
 @Service
 public class BlogService {
@@ -19,7 +22,7 @@ public class BlogService {
 	@Autowired
 	private BlogDao blogDao;
 
-	// 블로그 메인
+	// 블로그 메인 + 블로그 관리 - 기본
 	public BlogVo blogDetail(String id) {
 		System.out.println("BlogService.blogDetail()");
 		
@@ -74,6 +77,12 @@ public class BlogService {
 				System.out.println("수정 실패");
 			}
 		} else {
+			
+			BlogVo vo = blogDao.blogDetail(blogVo.getId().getId());
+			blogVo.setLogoFile(vo.getLogoFile());
+			System.out.println("blogVo : " + blogVo);
+			
+			// DB 연결
 			int count = blogDao.basicUpdate(blogVo);
 			if(count == 1) {
 				System.out.println("수정 성공");
@@ -82,6 +91,57 @@ public class BlogService {
 			}
 		}
 	}
+
+	// 블로그 관리 - 카테고리 리스트 ajax
+	public List<CategoryVo> categoryList(String id) {
+		System.out.println("BlogService.categoryList()");
+		
+		List<CategoryVo> categoryList = blogDao.categoryList(id);
+		
+		return categoryList;
+	}
 	
+	// 블로그 관리 - 카테고리 리스트 ajax + 포스트 수
+	public List<Map<String, Object>> categoryMapList(String id) {
+		System.out.println("BlogService.categoryMapList()");
+		
+		List<Map<String, Object>> cateMapList = blogDao.categoryMapList(id);
+		
+		return cateMapList;
+	}
+
+	// 블로그 관리 - 카테고리 추가 ajax
+	public CategoryVo categoryAdd(CategoryVo categoryVo) {
+		System.out.println("BlogService.categoryAdd()");
+		
+		int count = blogDao.selectKey(categoryVo);
+		if(count != 0) {
+			System.out.println("등록 성공");
+			
+			// 카테고리 정보
+			int cateNo = categoryVo.getCateNo();
+			CategoryVo vo = blogDao.selectCategory(cateNo);
+			
+			return vo;
+		} else {
+			System.out.println("등록 실패");
+			
+			return null;
+		}
+	}
 	
+	// 블로그 관리 - 카테고리 삭제 ajax
+	public int categoryDelete(CategoryVo categoryVo) {
+		System.out.println("BlogService.categoryDelete()");
+		
+		int count = blogDao.categoryDelete(categoryVo);
+		if(count == 1) {
+			System.out.println("삭제 성공");
+		} else {
+			System.out.println("삭제 실패");
+		}
+		
+		return count;
+	}
+
 }
