@@ -28,7 +28,54 @@
 			</fieldset>
 		</form>
 		
+		<br><br>
+		
 		<div id="resultList">
+			<table>
+				<colgroup>
+					<col style="">
+					<col style="width: 20%;">
+					<col style="">
+					<col style="width: 20%;">
+				</colgroup>
+				
+				<c:forEach items="${blogPageMap.blogList }" var="blogVo">
+					<tr>
+						<c:if test="${empty blogVo.logoFile }">
+							<!-- 기본이미지 -->
+							<img id="proImg" src="${pageContext.request.contextPath }/assets/images/sarang_profile.jpg">
+						</c:if>
+						<c:if test="${!empty blogVo.logoFile }">
+							<!-- 사용자업로드 이미지 -->
+							<img id="proImg" src="${pageContext.request.contextPath }/upload/${blogVo.logoFile }">
+						</c:if>
+						<td class="text-left"><a href="${pageContext.request.contextPath }/${blogVo.id }">${blogVo.blogTitle }</a></td>
+						<td class="text-right">${blogVo.id.userName }(${blogVo.id.id })</td>
+						<td class="text-right">${blogVo.id.joinDate }</td>
+					</tr>
+  				</c:forEach>
+			</table>
+			<div id="paging">
+				<ul style="display: flex; justify-content: center;">
+					<c:if test="${blogPageMap.prev }">
+						<li><a href="${pageContext.request.contextPath }?crtPage=${blogPageMap.startPageBtnNo - 1}&keyword=${blogPageMap.keyword}">◀</a></li>
+					</c:if>
+					<c:forEach begin="${blogPageMap.startPageBtnNo }" end="${blogPageMap.endPageBtnNo }" step="1" var="page">
+						<c:choose>
+							<c:when test="${param.crtPage == page }">
+								<li style="font-weight: bold;"><a href="${pageContext.request.contextPath }?crtPage=${page}&keyword=${blogPageMap.keyword}">${page }</a></li>
+							</c:when>
+							<c:otherwise>
+								<li><a href="${pageContext.request.contextPath }/?crtPage=${page}&keyword=${blogPageMap.keyword}">${page }</a></li>
+							</c:otherwise>
+						</c:choose>
+					</c:forEach>
+					<c:if test="${blogPageMap.next }">
+						<li><a href="${pageContext.request.contextPath }/?crtPage=${blogPageMap.endPageBtnNo + 1}&keyword=${blogPageMap.keyword}">▶</a></li>
+					</c:if>
+				</ul>
+				<div class="clear"></div>
+			</div>
 		</div>
 		
 		<!-- 메인 푸터 자리-->

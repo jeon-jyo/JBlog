@@ -47,6 +47,58 @@
 		<collection property="categoryVo" resultMap="CategoryMap"></collection>
 	</resultMap>
 	
+	<!-- 블로그 목록 + 페이징 -->
+	<select id="blogListPaging" parameterType="map" resultMap="BlogMap">
+		<![CDATA[
+			SELECT ort.rn
+			       ,ort.id
+			       ,ort.blogTitle
+			       ,ort.logofile
+			       ,ort.userno
+			       ,ort.username
+			       ,ort.joinDate
+			  FROM (SELECT ROWNUM rn
+			               ,ot.id
+			               ,ot.blogTitle
+			               ,ot.logofile
+			               ,ot.userno
+			               ,ot.username
+			               ,ot.joinDate
+			          FROM (SELECT b.id
+			                       ,b.blogTitle
+			                       ,b.logofile
+			                       ,u.userno
+			                       ,u.username
+			                       ,TO_CHAR(u.joinDate, 'YYYY/MM/DD') joinDate
+			                  FROM blog b, users u
+			                 WHERE b.id = u.id
+		]]>
+		<if test='keyword != ""'>
+			<![CDATA[
+				  			   AND b.blogTitle LIKE '%'||#{keyword}||'%'
+			]]>
+		</if>
+		<![CDATA[
+			                 ORDER BY u.userno DESC) ot
+							       ) ort
+							 WHERE ort.rn >= #{startRNum}
+							   AND ort.rn <= #{endRNum}
+		]]>
+	</select>
+	
+	<!-- 전체 블로그갯수 + 검색 -->
+	<select id="selectBlogCnt" parameterType="String" resultType="int">
+		<![CDATA[
+			SELECT COUNT(*) count
+  			  FROM blog
+		]]>
+		<if test='value != ""'>
+			<![CDATA[
+				  WHERE blogTitle LIKE '%'||#{keyword}||'%'
+			]]>
+		</if>
+	</select>
+	
 	<!-- 블로그 생성 -->
 	<insert id="blogInsert" parameterType="com.javaex.vo.BlogVo">
 		<![CDATA[
@@ -89,17 +141,41 @@
 		]]>
 	</select>
 	
-	<!-- 포스트 목록 -->
-	<select id="postList" parameterType="int" resultMap="PostMap">
+	<!-- 포스트 목록 + 페이징 -->
+	<select id="postListPaging" parameterType="map" resultMap="PostMap">
 		<![CDATA[
-			SELECT postNo
-			       ,cateNo
-			       ,postTitle
-			       ,postContent
-			       ,TO_CHAR(regDate, 'YYYY/MM/DD') regDate
-			  FROM post
-			 WHERE cateNo = #{cateNo}
-			 ORDER BY postNo DESC
+			SELECT ort.rn
+			       ,ort.postNo
+			       ,ort.cateNo
+			       ,ort.postTitle
+			       ,ort.postContent
+			       ,ort.regDate
+			  FROM (SELECT ROWNUM rn
+			               ,ot.postNo
+			               ,ot.cateNo
+			               ,ot.postTitle
+			               ,ot.postContent
+			               ,ot.regDate
+			          FROM (SELECT postNo
+			                       ,cateNo
+			                       ,postTitle
+			                       ,postContent
+			                       ,TO_CHAR(regDate, 'YYYY/MM/DD') regDate
+			                  FROM post
+			                 WHERE cateNo = #{cateNo}
+			                 ORDER BY postNo DESC) ot
+			       ) ort
+			 WHERE ort.rn >= #{startRNum}
+			   AND ort.rn <= #{endRNum}
+		]]>
+	</select>
+	
+	<!-- 전체 글갯수 -->
+	<select id="selectTotalCnt" parameterType="int" resultType="int">
+		<![CDATA[
+			SELECT COUNT(*) count
+  			  FROM post
+  			 WHERE cateNo = #{cateNo}
 		]]>
 	</select>
 	

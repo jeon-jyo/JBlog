@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -23,6 +24,60 @@ public class BlogService {
 	
 	@Autowired
 	private BlogDao blogDao;
+	
+	// 블로그 검색 목록 + 페이징
+	public Map<String, Object> blogListPaging(int crtPage, String keyword) {
+		System.out.println("BlogService.blogListPaging()");
+		System.out.println("crtPage : " + crtPage);
+		System.out.println("keyword : " + keyword);
+
+		// 글목록 계산 //////////////////////////////
+		
+		int listCnt = 10;
+		crtPage = (crtPage > 0) ? crtPage : 1;
+		int startRNum = (crtPage-1) * listCnt + 1;
+		int endRNum = (startRNum + listCnt) - 1;
+		
+		Map<String, Object> listMap = new HashMap<String, Object>();
+		listMap.put("startRNum", startRNum);
+		listMap.put("endRNum", endRNum);
+		listMap.put("keyword", keyword);
+		List<BlogVo> blogList = blogDao.blogListPaging(listMap);
+		
+		// 페이징 계산 //////////////////////////////
+		
+		int pageBtnCount = 5;
+		int endPageBtnNo = (int)Math.ceil(crtPage/(double)pageBtnCount)*pageBtnCount;
+		int startPageBtnNo = (endPageBtnNo-pageBtnCount)+1;
+		
+		// 전체 블로그갯수
+		int totalCnt = blogDao.selectBlogCnt(keyword);
+		System.out.println("totalCnt : " + totalCnt);
+		
+		// 화살표 유무 //////////////////////////////
+		
+		boolean next = false;
+		if(listCnt * endPageBtnNo < totalCnt) {
+			next = true;
+		} else {
+			endPageBtnNo = (int)Math.ceil(totalCnt/(double)listCnt);
+		}
+		
+		boolean prev = false;
+		if(startPageBtnNo != 1) {
+			prev = true;
+		}
+		
+		Map<String, Object> blogPageMap = new HashMap<String, Object>();
+		blogPageMap.put("startPageBtnNo", startPageBtnNo);
+		blogPageMap.put("endPageBtnNo", endPageBtnNo);
+		blogPageMap.put("prev", prev);
+		blogPageMap.put("next", next);
+		blogPageMap.put("blogList", blogList);
+		blogPageMap.put("keyword", keyword);
+
+		return blogPageMap;
+	}
 
 	// 블로그 메인 + 헤더
 	public BlogVo blogDetail(String id) {
@@ -42,15 +97,70 @@ public class BlogService {
 		return categoryList;
 	}
 	
-	// 포스트 목록
-	public List<PostVo> postList(int cateNo) {
-		System.out.println("BlogService.postList()");
+	// 포스트 목록 + 페이징
+	public Map<String, Object> postListPaging(int cateNo, int crtPage) {
+		System.out.println("BlogService.postListPaging()");
 		
-		List<PostVo> postList = blogDao.postList(cateNo);
-		
-		return postList;
-	}
+		// 글목록 계산 //////////////////////////////
 
+		// 페이지당 글갯수	- 한 페이지에 출력되는 글갯수
+		int listCnt = 5;
+		
+		// 현재 페이지		- 파라미터로 받는다
+		crtPage = (crtPage > 0) ? crtPage : 1;
+		
+		// 시작 글번호
+		int startRNum = (crtPage-1) * listCnt + 1;
+		
+		// 끝 글번호
+		int endRNum = (startRNum + listCnt) - 1;
+		
+		Map<String, Object> listMap = new HashMap<String, Object>();
+		listMap.put("startRNum", startRNum);
+		listMap.put("endRNum", endRNum);
+		listMap.put("cateNo", cateNo);
+		List<PostVo> postList = blogDao.postListPaging(listMap);
+		
+		// 페이징 계산 //////////////////////////////
+		
+		// 페이지당 버튼 갯수
+		int pageBtnCount = 5;
+		
+		// 마지막 버튼 번호
+		int endPageBtnNo = (int)Math.ceil(crtPage/(double)pageBtnCount)*pageBtnCount;
+		
+		// 시작 버튼 번호
+		int startPageBtnNo = (endPageBtnNo-pageBtnCount)+1;
+		
+		// 전체 글갯수
+		int totalCnt = blogDao.selectTotalCnt(cateNo);
+		System.out.println("totalCnt : " + totalCnt);
+		
+		// 다음화살표 유무
+		boolean next = false;
+		if(listCnt * endPageBtnNo < totalCnt) {
+			next = true;
+		} else {
+			// 다음버튼이 없을 때(false) - endPageBtnNo 다시 계산
+			endPageBtnNo = (int)Math.ceil(totalCnt/(double)listCnt);
+		}
+		
+		// 이전화살표 유무
+		boolean prev = false;
+		if(startPageBtnNo != 1) {
+			prev = true;
+		}
+		
+		Map<String, Object> postPageMap = new HashMap<String, Object>();
+		postPageMap.put("startPageBtnNo", startPageBtnNo);
+		postPageMap.put("endPageBtnNo", endPageBtnNo);
+		postPageMap.put("prev", prev);
+		postPageMap.put("next", next);
+		postPageMap.put("postList", postList);
+
+		return postPageMap;
+	}
+	
 	// 포스트 상세
 	public PostVo postDetail(int postNo) {
 		System.out.println("BlogService.postDetail()");
@@ -217,6 +327,15 @@ public class BlogService {
 	// 블로그 관리 - 포스트 등록
 	public void postInsert(PostVo postVo) {
 		System.out.println("BlogService.postInsert()");
+		
+		/*
+		for(int i = 1; i <= 78; i++) {
+			postVo.setPostTitle(i + "번째 글 제목");
+			postVo.setPostContent(i + "번째 글 내용");
+			
+			blogDao.postInsert(postVo);
+		}
+		*/
 		
 		int count = blogDao.postInsert(postVo);
 		if(count == 1) {

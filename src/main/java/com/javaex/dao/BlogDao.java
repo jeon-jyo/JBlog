@@ -18,6 +18,24 @@ public class BlogDao {
 	@Autowired
 	private SqlSession sqlSession;
 	
+	// 블로그 목록 + 페이징
+	public List<BlogVo> blogListPaging(Map<String, Object> listMap) {
+		System.out.println("BlogDao.blogListPaging()");
+		
+		List<BlogVo> blogList = sqlSession.selectList("blog.blogListPaging", listMap);
+		
+		return blogList;
+	}
+	
+	// 전체 블로그갯수 + 검색
+	public int selectBlogCnt(String keyword) {
+		System.out.println("BlogDao.selectBlogCnt()");
+		
+		int totalCount = sqlSession.selectOne("blog.selectBlogCnt", keyword);
+		
+		return totalCount;
+	}
+	
 	// 블로그 생성
 	public int blogInsert(BlogVo blogVo) {
 		System.out.println("BlogDao.blogInsert()");
@@ -53,14 +71,23 @@ public class BlogDao {
 		
 		return categoryList;
 	}
-
-	// 포스트 목록
-	public List<PostVo> postList(int cateNo) {
-		System.out.println("BlogDao.postList()");
+	
+	// 포스트 목록 + 페이징
+	public List<PostVo> postListPaging(Map<String, Object> listMap) {
+		System.out.println("BlogDao.postListPaging()");
 		
-		List<PostVo> postList = sqlSession.selectList("blog.postList", cateNo);
+		List<PostVo> postList = sqlSession.selectList("blog.postListPaging", listMap);
 		
 		return postList;
+	}
+	
+	// 전체 글갯수
+	public int selectTotalCnt(int cateNo) {
+		System.out.println("BlogDao.selectTotalCnt()");
+		
+		int totalCount = sqlSession.selectOne("blog.selectTotalCnt", cateNo);
+		
+		return totalCount;
 	}
 	
 	// 포스트 상세

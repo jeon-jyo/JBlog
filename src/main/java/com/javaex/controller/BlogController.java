@@ -34,22 +34,25 @@ public class BlogController {
 	@RequestMapping(value="/{id}", method= { RequestMethod.GET, RequestMethod.POST})
 	public String blogMain(@PathVariable(value="id") String id,
 			@RequestParam(value="cateNo", required=false, defaultValue="0") int cateNo,
-			@RequestParam(value="postNo", required=false, defaultValue="0") int postNo, Model model) {
+			@RequestParam(value="postNo", required=false, defaultValue="0") int postNo,
+			@RequestParam(value="crtPage", required=false, defaultValue="1") int crtPage, Model model) {
 		System.out.println("BlogController.blogMain()");
 		System.out.println("id : " + id);
 		System.out.println("cateNo : " + cateNo);
 		System.out.println("postNo : " + postNo);
+		System.out.println("crtPage : " + crtPage);
 		
 		BlogVo blogVo = blogService.blogDetail(id);
 		List<CategoryVo> categoryList = blogService.cateList(id);
 		
-		List<PostVo> postList = null;
+		Map<String, Object> postPageMap = null;
 		if(cateNo == 0) {
-			postList = blogService.postList(categoryList.get(0).getCateNo());
+			postPageMap = blogService.postListPaging(categoryList.get(0).getCateNo(), crtPage);
 		} else {
-			postList = blogService.postList(cateNo);
+			postPageMap = blogService.postListPaging(cateNo, crtPage);
 		}
 		
+		List<PostVo> postList = (List<PostVo>) postPageMap.get("postList");
 		PostVo postVo = null;
 		if(postNo == 0) {
 			if(postList.size() != 0) {
@@ -61,7 +64,7 @@ public class BlogController {
 		
 		model.addAttribute("blogVo", blogVo);
 		model.addAttribute("categoryList", categoryList);
-		model.addAttribute("postList", postList);
+		model.addAttribute("postPageMap", postPageMap);
 		model.addAttribute("postVo", postVo);
 		
 		return "blog/blog-main";
