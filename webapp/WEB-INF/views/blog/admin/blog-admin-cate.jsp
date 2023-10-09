@@ -45,7 +45,7 @@
 					</tbody>
 				</table>
       	
-		      	<table id="admin-cate-add" >
+		      	<table id="admin-cate-add">
 		      		<colgroup>
 						<col style="width: 100px;">
 						<col style="">
@@ -84,7 +84,7 @@
 	
 	// 카테고리 추가
 	$("#btnAddCate").on("click", function() {
-		console.log("ubtnAddCate");
+		console.log("btnAddCate");
 		
 		let name = $('input[name=name]').val();
 		let desc = $('input[name=desc]').val();

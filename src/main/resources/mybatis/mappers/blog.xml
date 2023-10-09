@@ -32,6 +32,14 @@
 		<result column="regDate" property="regDate"></result>
 		<collection property="cateNo" resultMap="CategoryMap"></collection>
 	</resultMap>
+
+	<resultMap id="CommentMap" type="com.javaex.vo.CommentVo">
+		<result column="cmtNo" property="cmtNo"></result>
+		<result column="cmtContent" property="cmtContent"></result>
+		<result column="regDate" property="regDate"></result>
+		<collection property="postNo" resultMap="PostMap"></collection>
+		<collection property="userNo" resultMap="UserMap"></collection>
+	</resultMap>
 	
 	<resultMap id="CategoryPostMap" type="java.util.Map">
 		<result column="postCnt" property="postCnt"></result>
@@ -104,12 +112,62 @@
 			       ,postContent
 			       ,TO_CHAR(regDate, 'YYYY/MM/DD') regDate
 			  FROM post
-			 WHERE postNo IN (SELECT MAX(postNo) no
-			                    FROM post
-			                   WHERE cateNo = #{cateNo}
-			                 )
+			 WHERE postNo = #{postNo}
 		]]>
 	</select>
+	
+	<!-- 코멘트 목록 ajax -->
+	<select id="commentList" parameterType="int" resultMap="CommentMap">
+		<![CDATA[
+			SELECT c.cmtNo
+			       ,c.postno
+			       ,u.userno
+			       ,u.username
+			       ,c.cmtcontent
+			       ,TO_CHAR(c.regDate, 'YYYY/MM/DD') regDate
+			  FROM comments c, users u
+			 WHERE postno = #{postNo}
+			   AND c.userno = u.userno
+			 ORDER BY cmtNo DESC
+		]]>
+	</select>
+	
+	<!-- 코멘트 작성 ajax -->
+	<insert id="selectCmtKey" parameterType="com.javaex.vo.CommentVo">
+		<selectKey keyProperty="cmtNo" resultType="int" order="BEFORE">	
+			select seq_comments_no.NEXTVAL from dual
+		</selectKey>
+		<![CDATA[
+			INSERT INTO comments
+			VALUES (#{cmtNo}, #{postNo.postNo}, #{userNo.userNo}, #{cmtContent}, sysdate)
+		]]>
+	</insert>
+	
+	<!-- 코멘트 정보 ajax -->
+	<select id="selectComment" parameterType="com.javaex.vo.CommentVo" resultMap="CommentMap">
+		<![CDATA[
+			SELECT c.cmtNo
+			       ,c.postno
+			       ,c.userno
+			       ,u.username
+			       ,c.cmtcontent
+			       ,TO_CHAR(c.regDate, 'YYYY/MM/DD') regDate
+			  FROM comments c, users u
+			 WHERE c.cmtNo IN (SELECT MAX(cmtNo)
+			                     FROM comments
+			                    WHERE postno = #{postNo.postNo})
+			   AND c.postno = #{postNo.postNo}
+			   AND c.userno = u.userno
+		]]>
+	</select>
+	
+	<!-- 코멘트 삭제 ajax -->
+	<delete id="commentDelete" parameterType="int">
+		<![CDATA[
+			DELETE FROM comments
+			 WHERE cmtNo = #{cmtNo}
+		]]>
+	</delete>
 	
 	<!-- 블로그 관리 -->
 	
@@ -161,7 +219,7 @@
 		]]>
 	</insert>
 	
-	<!-- 카테고리 정보 -->
+	<!-- 카테고리 정보 ajax -->
 	<select id="selectCategory" parameterType="com.javaex.vo.CategoryVo" resultMap="CategoryPostMap">
 		<![CDATA[
 			SELECT ot.cnt rn

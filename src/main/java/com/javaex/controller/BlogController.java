@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.javaex.service.BlogService;
 import com.javaex.vo.BlogVo;
 import com.javaex.vo.CategoryVo;
+import com.javaex.vo.CommentVo;
 import com.javaex.vo.JsonResultVo;
 import com.javaex.vo.PostVo;
 import com.javaex.vo.UserVo;
@@ -31,16 +32,31 @@ public class BlogController {
 	
 	// 블로그 메인
 	@RequestMapping(value="/{id}", method= { RequestMethod.GET, RequestMethod.POST})
-	public String blogMain(@PathVariable(value="id") String id, Model model) {
+	public String blogMain(@PathVariable(value="id") String id,
+			@RequestParam(value="cateNo", required=false, defaultValue="0") int cateNo,
+			@RequestParam(value="postNo", required=false, defaultValue="0") int postNo, Model model) {
 		System.out.println("BlogController.blogMain()");
 		System.out.println("id : " + id);
+		System.out.println("cateNo : " + cateNo);
+		System.out.println("postNo : " + postNo);
 		
 		BlogVo blogVo = blogService.blogDetail(id);
 		List<CategoryVo> categoryList = blogService.cateList(id);
-		List<PostVo> postList = blogService.postList(categoryList.get(0).getCateNo());
+		
+		List<PostVo> postList = null;
+		if(cateNo == 0) {
+			postList = blogService.postList(categoryList.get(0).getCateNo());
+		} else {
+			postList = blogService.postList(cateNo);
+		}
+		
 		PostVo postVo = null;
-		if(postList.size() != 0) {
-			postVo = postList.get(0);
+		if(postNo == 0) {
+			if(postList.size() != 0) {
+				postVo = postList.get(0);
+			}
+		} else {
+			postVo = blogService.postDetail(postNo);
 		}
 		
 		model.addAttribute("blogVo", blogVo);
@@ -50,27 +66,72 @@ public class BlogController {
 		
 		return "blog/blog-main";
 	}
-
-	// 블로그 메인 - 카테고리 선택
-	@RequestMapping(value="/blog/categoty", method= { RequestMethod.GET, RequestMethod.POST})
-	public String blogCategory(@PathVariable(value="id") String id, Model model) {
-		System.out.println("BlogController.blogCategory()");
-		System.out.println("id : " + id);
+	
+	// 코멘트 목록 ajax
+	@ResponseBody
+	@RequestMapping(value="/{no}/blog/commentList", method= { RequestMethod.GET, RequestMethod.POST})
+	public JsonResultVo blogCommentList(@PathVariable(value="no") int postNo) {
+		System.out.println("BlogController.blogCommentList()");
+		System.out.println("postNo : " + postNo);
 		
-		BlogVo blogVo = blogService.blogDetail(id);
-		List<CategoryVo> categoryList = blogService.cateList(id);
-		List<PostVo> postList = blogService.postList(categoryList.get(0).getCateNo());
-		PostVo postVo = null;
-		if(postList.size() != 0) {
-			postVo = postList.get(0);
+		List<CommentVo> commentList = blogService.commentList(postNo);
+		
+		JsonResultVo jsonResultVo = new JsonResultVo();
+		jsonResultVo.success(commentList);
+		
+		return jsonResultVo;
+	}
+	
+	// 코멘트 추가 ajax
+	@ResponseBody
+	@RequestMapping(value="/{no}/blog/commentAdd", method= { RequestMethod.GET, RequestMethod.POST})
+	public JsonResultVo blogCommentAdd(@PathVariable(value="no") int postNo,
+			@ModelAttribute CommentVo commentVo, HttpSession session) {
+		System.out.println("BlogController.blogCommentAdd()");
+		
+		PostVo postVo = new PostVo();
+		postVo.setPostNo(postNo);
+		commentVo.setPostNo(postVo);
+		
+		UserVo authUser = (UserVo)session.getAttribute("authUser");
+		commentVo.setUserNo(authUser);
+		
+		CommentVo vo = blogService.commentAdd(commentVo);
+		System.out.println("vo : " + vo);
+		
+		JsonResultVo jsonResultVo = new JsonResultVo();
+		if(vo != null) {
+			System.out.println("성공 : ");
+			jsonResultVo.success(vo);
+			
+			return jsonResultVo;
+		} else {
+			System.out.println("실패 : ");
+			jsonResultVo.fail("commentAdd 실패");
+			
+			return jsonResultVo;
 		}
+	}
+	
+	// 코멘트 삭제 ajax
+	@ResponseBody
+	@RequestMapping(value="/{no}/blog/commentDelete", method= { RequestMethod.GET, RequestMethod.POST})
+	public JsonResultVo blogCommentDelete(@PathVariable(value="no") int cmtNo) {
+		System.out.println("BlogController.adminCategoryDelete()");
+		System.out.println("cmtNo : " + cmtNo);
 		
-		model.addAttribute("blogVo", blogVo);
-		model.addAttribute("categoryList", categoryList);
-		model.addAttribute("postList", postList);
-		model.addAttribute("postVo", postVo);
+		int count = blogService.commentDelete(cmtNo);
 		
-		return "blog/blog-main";
+		JsonResultVo jsonResultVo = new JsonResultVo();
+		if(count != 0) {
+			jsonResultVo.success("");
+			
+			return jsonResultVo;
+		} else {
+			jsonResultVo.fail("commentDelete 실패");
+			
+			return jsonResultVo;
+		}
 	}
 	
 	// 블로그 로그아웃
@@ -203,11 +264,11 @@ public class BlogController {
 	// 블로그 관리 - 포스트 등록
 	@RequestMapping(value="/{id}/admin/write", method= { RequestMethod.GET, RequestMethod.POST})
 	public String adminWrite(@PathVariable(value="id") String id,
-			@RequestParam(value="no") int no, @ModelAttribute PostVo postVo) {
+			@RequestParam(value="categoryNo") int cateNo, @ModelAttribute PostVo postVo) {
 		System.out.println("BlogController.adminWrite()");
 		
 		CategoryVo categoryVo = new CategoryVo();
-		categoryVo.setCateNo(no);
+		categoryVo.setCateNo(cateNo);
 		postVo.setCateNo(categoryVo);
 		
 		blogService.postInsert(postVo);

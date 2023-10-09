@@ -35,7 +35,7 @@
 			      				<input type="text" name="postTitle">
 				      		</td>
 				      		<td>
-				      			<select name="no">
+				      			<select name="categoryNo">
 				      				<!-- 카테고리 리스트 영역 -->
 				      				<c:forEach items="${categoryList }" var="categoryVo">
 				      					<option value="${categoryVo.cateNo }">${categoryVo.cateName }</option>

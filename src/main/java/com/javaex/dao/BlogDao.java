@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.javaex.vo.BlogVo;
 import com.javaex.vo.CategoryVo;
+import com.javaex.vo.CommentVo;
 import com.javaex.vo.PostVo;
 
 @Repository
@@ -63,12 +64,48 @@ public class BlogDao {
 	}
 	
 	// 포스트 상세
-	public PostVo postDetail(int cateNo) {
+	public PostVo postDetail(int postNo) {
 		System.out.println("BlogDao.postDetail()");
 		
-		PostVo postVo = sqlSession.selectOne("blog.postDetail", cateNo);
+		PostVo postVo = sqlSession.selectOne("blog.postDetail", postNo);
 		
 		return postVo;
+	}
+	
+	// 코멘트 목록 ajax
+	public List<CommentVo> commentList(int postNo) {
+		System.out.println("BlogDao.commentList()");
+				
+		List<CommentVo> commentList = sqlSession.selectList("blog.commentList", postNo);
+		
+		return commentList;
+	}
+	
+	// 코멘트 추가 ajax
+	public int selectCmtKey(CommentVo commentVo) {
+		System.out.println("BlogDao.selectCmtKey()");
+		
+		int count = sqlSession.insert("blog.selectCmtKey", commentVo);
+		
+		return count;
+	}
+
+	// 코멘트 정보 ajax
+	public CommentVo selectComment(CommentVo commentVo) {
+		System.out.println("BlogDao.selectComment()");
+		
+		CommentVo vo = sqlSession.selectOne("blog.selectComment", commentVo);
+		
+		return vo;
+	}
+	
+	// 코멘트 삭제 ajax
+	public int commentDelete(int cmtNo) {
+		System.out.println("BlogDao.commentDelete()");
+		
+		int count = sqlSession.delete("blog.commentDelete", cmtNo);
+		
+		return count;
 	}
 	
 	// ----- 블로그 관리 ------------------------------
@@ -100,7 +137,7 @@ public class BlogDao {
 		return count;
 	}
 	
-	// 카테고리 정보
+	// 카테고리 정보 ajax
 	public Map<String, Object> selectCategory(CategoryVo categoryVo) {
 		System.out.println("BlogDao.selectCategory()");
 		
@@ -117,8 +154,6 @@ public class BlogDao {
 		
 		return count;
 	}
-
-
 
 	// 블로그 관리 - 포스트 등록
 	public int postInsert(PostVo postVo) {

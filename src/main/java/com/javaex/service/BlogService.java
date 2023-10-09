@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.javaex.dao.BlogDao;
 import com.javaex.vo.BlogVo;
 import com.javaex.vo.CategoryVo;
+import com.javaex.vo.CommentVo;
 import com.javaex.vo.PostVo;
 
 @Service
@@ -51,12 +52,57 @@ public class BlogService {
 	}
 
 	// 포스트 상세
-	public PostVo postDetail(int cateNo) {
+	public PostVo postDetail(int postNo) {
 		System.out.println("BlogService.postDetail()");
 		
-		PostVo postVo = blogDao.postDetail(cateNo);
+		PostVo postVo = blogDao.postDetail(postNo);
 		
 		return postVo;
+	}
+	
+	// 코멘트 목록 ajax
+	public List<CommentVo> commentList(int postNo) {
+		System.out.println("BlogService.commentList()");
+		
+		List<CommentVo> commentList = blogDao.commentList(postNo);
+		System.out.println("commentList.size() : " + commentList.size());
+		
+		return commentList;
+	}
+	
+	// 코멘트 추가 ajax
+	public CommentVo commentAdd(CommentVo commentVo) {
+		System.out.println("BlogService.commentAdd()");
+		
+		int count = blogDao.selectCmtKey(commentVo);
+		System.out.println("commentVo : " + commentVo);
+		if(count != 0) {
+			System.out.println("등록 성공");
+			
+			// 코멘트 정보 ajax
+			CommentVo vo = blogDao.selectComment(commentVo);
+			System.out.println("vo : " + vo);
+			
+			return vo;
+		} else {
+			System.out.println("등록 실패");
+			
+			return null;
+		}
+	}
+	
+	// 코멘트 삭제 ajax
+	public int commentDelete(int cmtNo) {
+		System.out.println("BlogService.commentDelete()");
+		
+		int count = blogDao.commentDelete(cmtNo);
+		if(count == 1) {
+			System.out.println("삭제 성공");
+			
+		} else {
+			System.out.println("삭제 실패");
+		}
+		return count;
 	}
 	
 	// ----- 블로그 관리 ------------------------------
@@ -138,7 +184,7 @@ public class BlogService {
 		if(count != 0) {
 			System.out.println("등록 성공");
 			
-			// 카테고리 정보
+			// 카테고리 정보 ajax
 			Map<String, Object> cateMap = blogDao.selectCategory(categoryVo);
 			
 			return cateMap;
