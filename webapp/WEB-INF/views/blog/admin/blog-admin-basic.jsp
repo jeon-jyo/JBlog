@@ -14,7 +14,12 @@
 		<c:import url="/WEB-INF/views/includes/blog-header.jsp"></c:import>
 
 		<div id="content">
-			<c:import url="/WEB-INF/views/includes/blog-admin-menu.jsp"></c:import>
+			<ul id="admin-menu" class="clearfix">
+				<li class="tabbtn selected"><a href="${pageContext.request.contextPath }/${authUser.id}/admin/basic">기본설정</a></li>
+				<li class="tabbtn"><a href="${pageContext.request.contextPath }/${authUser.id}/admin/category">카테고리</a></li>
+				<li class="tabbtn"><a href="${pageContext.request.contextPath }/${authUser.id}/admin/writeForm">글작성</a></li>
+			</ul>
+			<!-- //admin-menu -->
 			
 			<div id="admin-content">
 				<form action="${pageContext.request.contextPath}/admin/basicUpdate" method="post" enctype="multipart/form-data">

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.javaex.vo.BlogVo;
 import com.javaex.vo.CategoryVo;
+import com.javaex.vo.PostVo;
 
 @Repository
 public class BlogDao {
@@ -24,8 +25,17 @@ public class BlogDao {
 		
 		return count;
 	}
+	
+	// 기본 카테고리 생성
+	public int categoryInsert(CategoryVo categoryVo) {
+		System.out.println("BlogDao.categoryInsert()");
+		
+		int count = sqlSession.insert("blog.categoryInsert", categoryVo);
+		
+		return count;
+	}
 
-	// 블로그 메인 + 블로그 관리 - 기본
+	// 블로그 메인 + 헤더
 	public BlogVo blogDetail(String id) {
 		System.out.println("BlogDao.blogDetail()");
 		
@@ -34,6 +44,33 @@ public class BlogDao {
 		return blogVo;
 	}
 
+	// 카테고리 목록
+	public List<CategoryVo> cateList(String id) {
+		System.out.println("BlogDao.cateList()");
+		
+		List<CategoryVo> categoryList = sqlSession.selectList("blog.cateList", id);
+		
+		return categoryList;
+	}
+
+	// 포스트 목록
+	public List<PostVo> postList(int cateNo) {
+		System.out.println("BlogDao.postList()");
+		
+		List<PostVo> postList = sqlSession.selectList("blog.postList", cateNo);
+		
+		return postList;
+	}
+	
+	// 포스트 상세
+	public PostVo postDetail(int cateNo) {
+		System.out.println("BlogDao.postDetail()");
+		
+		PostVo postVo = sqlSession.selectOne("blog.postDetail", cateNo);
+		
+		return postVo;
+	}
+	
 	// ----- 블로그 관리 ------------------------------
 	
 	// 블로그 관리 - 기본 수정
@@ -45,7 +82,7 @@ public class BlogDao {
 		return count;
 	}
 	
-	// 블로그 관리 - 카테고리 리스트 + 포스트 수 ajax
+	// 블로그 관리 - 카테고리 목록 + 포스트 수 ajax
 	public List<Map<String, Object>> categoryList(String id) {
 		System.out.println("BlogDao.categoryList()");
 		
@@ -64,19 +101,30 @@ public class BlogDao {
 	}
 	
 	// 카테고리 정보
-	public Map<String, Object> selectCategory(int cateNo) {
+	public Map<String, Object> selectCategory(CategoryVo categoryVo) {
 		System.out.println("BlogDao.selectCategory()");
 		
-		Map<String, Object> cateMap = sqlSession.selectOne("blog.selectCategory", cateNo);
+		Map<String, Object> cateMap = sqlSession.selectOne("blog.selectCategory", categoryVo);
 		
 		return cateMap;
 	}
 
 	// 블로그 관리 - 카테고리 삭제 ajax
-	public int categoryDelete(CategoryVo categoryVo) {
+	public int categoryDelete(int cateNo) {
 		System.out.println("BlogDao.categoryDelete()");
 		
-		int count = sqlSession.delete("blog.categoryDelete", categoryVo);
+		int count = sqlSession.delete("blog.categoryDelete", cateNo);
+		
+		return count;
+	}
+
+
+
+	// 블로그 관리 - 포스트 등록
+	public int postInsert(PostVo postVo) {
+		System.out.println("BlogDao.postInsert()");
+		
+		int count = sqlSession.insert("blog.postInsert", postVo);
 		
 		return count;
 	}

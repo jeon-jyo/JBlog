@@ -25,6 +25,14 @@
 		<collection property="id" resultMap="BlogMap"></collection>
 	</resultMap>
 	
+	<resultMap id="PostMap" type="com.javaex.vo.PostVo">
+		<result column="postNo" property="postNo"></result>
+		<result column="postTitle" property="postTitle"></result>
+		<result column="postContent" property="postContent"></result>
+		<result column="regDate" property="regDate"></result>
+		<collection property="cateNo" resultMap="CategoryMap"></collection>
+	</resultMap>
+	
 	<resultMap id="CategoryPostMap" type="java.util.Map">
 		<result column="postCnt" property="postCnt"></result>
 		<result column="rn" property="rn"></result>
@@ -39,7 +47,15 @@
 		]]>
 	</insert>
 	
-	<!-- 블로그 메인 + 블로그 관리 - 기본 -->
+	<!-- 기본 카테고리 생성 -->
+	<insert id="categoryInsert" parameterType="com.javaex.vo.CategoryVo">
+		<![CDATA[
+			INSERT INTO category
+			VALUES (seq_category_no.NEXTVAL, #{id.id.id}, #{cateName}, #{description}, sysdate)
+		]]>
+	</insert>
+	
+	<!-- 블로그 메인 + 헤더 -->
 	<select id="blogDetail" parameterType="String" resultMap="BlogMap">
 		<![CDATA[
 			SELECT u.userNo
@@ -50,6 +66,48 @@
 			  FROM users u, blog b
 			 WHERE u.id = b.id
 			   AND u.id = #{id}
+		]]>
+	</select>
+
+	<!-- 카테고리 목록 -->
+	<select id="cateList" parameterType="String" resultMap="CategoryMap">
+		<![CDATA[
+			SELECT cateNo
+			 	   ,id
+			 	   ,cateName
+			  FROM category
+			 WHERE id = #{id}
+		     ORDER BY cateNo DESC
+		]]>
+	</select>
+	
+	<!-- 포스트 목록 -->
+	<select id="postList" parameterType="int" resultMap="PostMap">
+		<![CDATA[
+			SELECT postNo
+			       ,cateNo
+			       ,postTitle
+			       ,postContent
+			       ,TO_CHAR(regDate, 'YYYY/MM/DD') regDate
+			  FROM post
+			 WHERE cateNo = #{cateNo}
+			 ORDER BY postNo DESC
+		]]>
+	</select>
+	
+	<!-- 포스트 상세 -->
+	<select id="postDetail" parameterType="int" resultMap="PostMap">
+		<![CDATA[
+			SELECT postNo
+			       ,cateNo
+			       ,postTitle
+			       ,postContent
+			       ,TO_CHAR(regDate, 'YYYY/MM/DD') regDate
+			  FROM post
+			 WHERE postNo IN (SELECT MAX(postNo) no
+			                    FROM post
+			                   WHERE cateNo = #{cateNo}
+			                 )
 		]]>
 	</select>
 	
@@ -65,7 +123,7 @@
 		]]>
 	</update>
 
-	<!-- 블로그 관리 - 카테고리 리스트 + 포스트 수 ajax -->
+	<!-- 블로그 관리 - 카테고리 목록 + 포스트 수 ajax -->
 	<select id="categoryList" parameterType="String" resultMap="CategoryPostMap">
 		<![CDATA[
 			SELECT ROWNUM rn
@@ -104,7 +162,7 @@
 	</insert>
 	
 	<!-- 카테고리 정보 -->
-	<select id="selectCategory" parameterType="int" resultMap="CategoryPostMap">
+	<select id="selectCategory" parameterType="com.javaex.vo.CategoryVo" resultMap="CategoryPostMap">
 		<![CDATA[
 			SELECT ot.cnt rn
 			       ,c.cateNo
@@ -113,18 +171,27 @@
 			       ,c.description
 			       ,NVL(NULL, 0) postCnt
 			  FROM category c, (SELECT count(cateNo) cnt
-			                     FROM category
+			                      FROM category
+			                     WHERE id = #{id.id.id}
 			                   ) ot
 			 WHERE c.cateNo = #{cateNo}
 		]]>
 	</select>
 	
 	<!-- 블로그 관리 - 카테고리 삭제 ajax -->
-	<delete id="categoryDelete" parameterType="com.javaex.vo.CategoryVo">
+	<delete id="categoryDelete" parameterType="int">
 		<![CDATA[
 			DELETE FROM category
 			 WHERE cateNo = #{cateNo}
 		]]>
 	</delete>
+	
+	<!-- 블로그 관리 - 포스트 등록 -->
+	<insert id="postInsert" parameterType="com.javaex.vo.PostVo">
+		<![CDATA[
+			INSERT INTO post
+			VALUES (seq_post_no.NEXTVAL, #{cateNo.cateNo}, #{postTitle}, #{postContent}, sysdate)
+		]]>
+	</insert>
 	
 </mapper>

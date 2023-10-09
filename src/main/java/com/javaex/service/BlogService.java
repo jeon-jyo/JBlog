@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.javaex.dao.BlogDao;
 import com.javaex.vo.BlogVo;
 import com.javaex.vo.CategoryVo;
+import com.javaex.vo.PostVo;
 
 @Service
 public class BlogService {
@@ -22,7 +23,7 @@ public class BlogService {
 	@Autowired
 	private BlogDao blogDao;
 
-	// 블로그 메인 + 블로그 관리 - 기본
+	// 블로그 메인 + 헤더
 	public BlogVo blogDetail(String id) {
 		System.out.println("BlogService.blogDetail()");
 		
@@ -30,12 +31,39 @@ public class BlogService {
 		
 		return blogVo;
 	}
+
+	// 카테고리 목록
+	public List<CategoryVo> cateList(String id) {
+		System.out.println("BlogService.cateList()");
+		
+		List<CategoryVo> categoryList = blogDao.cateList(id);
+		
+		return categoryList;
+	}
+	
+	// 포스트 목록
+	public List<PostVo> postList(int cateNo) {
+		System.out.println("BlogService.postList()");
+		
+		List<PostVo> postList = blogDao.postList(cateNo);
+		
+		return postList;
+	}
+
+	// 포스트 상세
+	public PostVo postDetail(int cateNo) {
+		System.out.println("BlogService.postDetail()");
+		
+		PostVo postVo = blogDao.postDetail(cateNo);
+		
+		return postVo;
+	}
 	
 	// ----- 블로그 관리 ------------------------------
 	
 	// 블로그 관리 - 기본 수정
 	public void basicUpdate(BlogVo blogVo, MultipartFile file) {
-		System.out.println("BlogService.blogDetail()");
+		System.out.println("BlogService.basicUpdate()");
 		System.out.println("file.isEmpty() : " + file.isEmpty());
 		
 		if(!file.isEmpty()) {
@@ -92,12 +120,11 @@ public class BlogService {
 		}
 	}
 	
-	// 블로그 관리 - 카테고리 리스트 + 포스트 수 ajax
+	// 블로그 관리 - 카테고리 목록 + 포스트 수 ajax
 	public List<Map<String, Object>> categoryList(String id) {
 		System.out.println("BlogService.categoryList()");
 		
 		List<Map<String, Object>> cateMapList = blogDao.categoryList(id);
-		// System.out.println("cateMapList : " + cateMapList);
 		System.out.println("cateMapList.size() : " + cateMapList.size());
 		
 		return cateMapList;
@@ -112,8 +139,7 @@ public class BlogService {
 			System.out.println("등록 성공");
 			
 			// 카테고리 정보
-			int cateNo = categoryVo.getCateNo();
-			Map<String, Object> cateMap = blogDao.selectCategory(cateNo);
+			Map<String, Object> cateMap = blogDao.selectCategory(categoryVo);
 			
 			return cateMap;
 		} else {
@@ -124,17 +150,34 @@ public class BlogService {
 	}
 	
 	// 블로그 관리 - 카테고리 삭제 ajax
-	public int categoryDelete(CategoryVo categoryVo) {
+	public List<Map<String, Object>> categoryDelete(int cateNo, String id) {
 		System.out.println("BlogService.categoryDelete()");
 		
-		int count = blogDao.categoryDelete(categoryVo);
+		int count = blogDao.categoryDelete(cateNo);
 		if(count == 1) {
 			System.out.println("삭제 성공");
+			
+			List<Map<String, Object>> cateMapList = blogDao.categoryList(id);
+			System.out.println("cateMapList.size() : " + cateMapList.size());;
+			
+			return cateMapList;
 		} else {
 			System.out.println("삭제 실패");
+			
+			return null;
 		}
+	}
+
+	// 블로그 관리 - 포스트 등록
+	public void postInsert(PostVo postVo) {
+		System.out.println("BlogService.postInsert()");
 		
-		return count;
+		int count = blogDao.postInsert(postVo);
+		if(count == 1) {
+			System.out.println("등록 성공");
+		} else {
+			System.out.println("등록 실패");
+		}
 	}
 
 }

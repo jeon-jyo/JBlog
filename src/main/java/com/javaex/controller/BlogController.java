@@ -20,6 +20,7 @@ import com.javaex.service.BlogService;
 import com.javaex.vo.BlogVo;
 import com.javaex.vo.CategoryVo;
 import com.javaex.vo.JsonResultVo;
+import com.javaex.vo.PostVo;
 import com.javaex.vo.UserVo;
 
 @Controller
@@ -35,8 +36,39 @@ public class BlogController {
 		System.out.println("id : " + id);
 		
 		BlogVo blogVo = blogService.blogDetail(id);
+		List<CategoryVo> categoryList = blogService.cateList(id);
+		List<PostVo> postList = blogService.postList(categoryList.get(0).getCateNo());
+		PostVo postVo = null;
+		if(postList.size() != 0) {
+			postVo = postList.get(0);
+		}
 		
 		model.addAttribute("blogVo", blogVo);
+		model.addAttribute("categoryList", categoryList);
+		model.addAttribute("postList", postList);
+		model.addAttribute("postVo", postVo);
+		
+		return "blog/blog-main";
+	}
+
+	// 블로그 메인 - 카테고리 선택
+	@RequestMapping(value="/blog/categoty", method= { RequestMethod.GET, RequestMethod.POST})
+	public String blogCategory(@PathVariable(value="id") String id, Model model) {
+		System.out.println("BlogController.blogCategory()");
+		System.out.println("id : " + id);
+		
+		BlogVo blogVo = blogService.blogDetail(id);
+		List<CategoryVo> categoryList = blogService.cateList(id);
+		List<PostVo> postList = blogService.postList(categoryList.get(0).getCateNo());
+		PostVo postVo = null;
+		if(postList.size() != 0) {
+			postVo = postList.get(0);
+		}
+		
+		model.addAttribute("blogVo", blogVo);
+		model.addAttribute("categoryList", categoryList);
+		model.addAttribute("postList", postList);
+		model.addAttribute("postVo", postVo);
 		
 		return "blog/blog-main";
 	}
@@ -93,7 +125,7 @@ public class BlogController {
 		return "blog/admin/blog-admin-cate";
 	}
 	
-	// 블로그 관리 - 카테고리 리스트 + 포스트 수 ajax
+	// 블로그 관리 - 카테고리 목록 + 포스트 수 ajax
 	@ResponseBody
 	@RequestMapping(value="/{id}/admin/categoryList", method= { RequestMethod.GET, RequestMethod.POST})
 	public JsonResultVo adminCategoryList(@PathVariable(value="id") String id) {
@@ -118,7 +150,6 @@ public class BlogController {
 		BlogVo blogVo = new BlogVo();
 		blogVo.setId(authUser);
 		categoryVo.setId(blogVo);
-		System.out.println("categoryVo : " + categoryVo);
 		
 		Map<String, Object> cateMap = blogService.categoryAdd(categoryVo);
 		
@@ -136,15 +167,15 @@ public class BlogController {
 	
 	// 블로그 관리 - 카테고리 삭제 ajax
 	@ResponseBody
-	@RequestMapping(value="/admin/categoryDelete", method= { RequestMethod.GET, RequestMethod.POST})
-	public JsonResultVo adminCategoryDelete(@ModelAttribute CategoryVo categoryVo) {
+	@RequestMapping(value="/{id}/admin/categoryDelete", method= { RequestMethod.GET, RequestMethod.POST})
+	public JsonResultVo adminCategoryDelete(@PathVariable(value="id") String id, @RequestParam(value="cateNo") int cateNo) {
 		System.out.println("BlogController.adminCategoryDelete()");
 		
-		int count = blogService.categoryDelete(categoryVo);
+		List<Map<String, Object>> cateMapList = blogService.categoryDelete(cateNo, id);
 		
 		JsonResultVo jsonResultVo = new JsonResultVo();
-		if(count == 1) {
-			jsonResultVo.success("");
+		if(cateMapList != null) {
+			jsonResultVo.success(cateMapList);
 			
 			return jsonResultVo;
 		} else {
@@ -152,6 +183,36 @@ public class BlogController {
 			
 			return jsonResultVo;
 		}
+	}
+	
+	// 블로그 관리 - 글작성폼
+	@RequestMapping(value="/{id}/admin/writeForm", method= { RequestMethod.GET, RequestMethod.POST})
+	public String adminWriteForm(@PathVariable(value="id") String id, Model model) {
+		System.out.println("BlogController.adminWriteForm()");
+		System.out.println("id : " + id);
+		
+		BlogVo blogVo = blogService.blogDetail(id);
+		List<CategoryVo> categoryList = blogService.cateList(id);
+		
+		model.addAttribute("blogVo", blogVo);
+		model.addAttribute("categoryList", categoryList);
+		
+		return "blog/admin/blog-admin-write";
+	}
+	
+	// 블로그 관리 - 포스트 등록
+	@RequestMapping(value="/{id}/admin/write", method= { RequestMethod.GET, RequestMethod.POST})
+	public String adminWrite(@PathVariable(value="id") String id,
+			@RequestParam(value="no") int no, @ModelAttribute PostVo postVo) {
+		System.out.println("BlogController.adminWrite()");
+		
+		CategoryVo categoryVo = new CategoryVo();
+		categoryVo.setCateNo(no);
+		postVo.setCateNo(categoryVo);
+		
+		blogService.postInsert(postVo);
+
+		return "redirect:/" + id + "/admin/writeForm";
 	}
 
 }

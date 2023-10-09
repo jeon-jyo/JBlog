@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.javaex.dao.BlogDao;
 import com.javaex.dao.UserDao;
 import com.javaex.vo.BlogVo;
+import com.javaex.vo.CategoryVo;
 import com.javaex.vo.UserVo;
 
 @Service
@@ -45,6 +46,20 @@ public class UserService {
 			int insertCnt = blogDao.blogInsert(blogVo);
 			if(insertCnt == 1) {
 				System.out.println("생성 완료");
+				
+				CategoryVo categoryVo = new CategoryVo();
+				categoryVo.setId(blogVo);
+				categoryVo.setCateName("미분류");
+				categoryVo.setDescription("기본으로 만들어지는 카테고리 입니다.");
+				
+				// 기본 카테고리 생성
+				int cnt = blogDao.categoryInsert(categoryVo);
+				if(cnt == 1) {
+					System.out.println("생성 모두 완료");
+					
+				} else {
+					System.out.println("생성 실패");
+				}
 			} else {
 				System.out.println("생성 실패");
 			}

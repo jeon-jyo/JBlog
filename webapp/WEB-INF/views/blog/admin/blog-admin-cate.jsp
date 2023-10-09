@@ -15,7 +15,12 @@
 		<c:import url="/WEB-INF/views/includes/blog-header.jsp"></c:import>
 
 		<div id="content">
-			<c:import url="/WEB-INF/views/includes/blog-admin-menu.jsp"></c:import>
+			<ul id="admin-menu" class="clearfix">
+				<li class="tabbtn"><a href="${pageContext.request.contextPath }/${authUser.id}/admin/basic">기본설정</a></li>
+				<li class="tabbtn selected"><a href="${pageContext.request.contextPath }/${authUser.id}/admin/category">카테고리</a></li>
+				<li class="tabbtn"><a href="${pageContext.request.contextPath }/${authUser.id}/admin/writeForm">글작성</a></li>
+			</ul>
+			<!-- //admin-menu -->
 			
 			<div id="admin-content">
 				<table id="admin-cate-list">
@@ -56,7 +61,6 @@
 		      	</table> 
 			
 				<div id="btnArea">
-					<input type="hidden" name="hiddenCnt" value="0">
 		      		<button id="btnAddCate" class="btn_l" type="submit">카테고리추가</button>
 		      	</div>
 			</div>
@@ -131,7 +135,7 @@
 			alert("삭제할 수 없습니다.");
 		} else {
 			$.ajax({
-				url : "${pageContext.request.contextPath}/admin/categoryDelete/",
+				url : "${pageContext.request.contextPath}/${authUser.id}/admin/categoryDelete/",
 				type : "get",
 				data: {cateNo: cateNo},
 				
@@ -140,7 +144,12 @@
 					if(jsonResult.result  == "success") {
 						console.log("success");
 						
-						$("#t" + cateNo).remove();
+						let cateList = document.querySelector("#cateList");
+						cateList.innerHTML = "";
+						
+						for(let i = 0; i < jsonResult.data.length; i++) {
+							render(jsonResult.data[i], "down");
+						}
 						
 					} else if(jsonResult.result  == "fail") {
 						console.log("fail");
@@ -182,12 +191,14 @@
 	function render(cateMap, dir) {
 		console.log("render()");
 		
+		let value = (cateMap.categoryVo.description == null) ? "" : cateMap.categoryVo.description;
+		
 		let str = '';
-		str += '<tr id="t' + cateMap.categoryVo.cateNo + '">';
+		str += '<tr>';
 		str += '	<td>' + cateMap.rn + '</td>';
 		str += '	<td>' + cateMap.categoryVo.cateName + '</td>';
 		str += '	<td>' + cateMap.postCnt + '</td>';
-		str += '	<td>' + cateMap.categoryVo.description + '</td>';
+		str += '	<td>' + value + '</td>';
 		str += '	<td class="text-center">';
 		str += '		<img class="btnCateDel" data-cateno="' + cateMap.categoryVo.cateNo
 						+ '" data-postno="' + cateMap.postCnt
