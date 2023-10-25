@@ -24,16 +24,14 @@ public class BlogService {
 	
 	@Autowired
 	private BlogDao blogDao;
-	
+
 	// 블로그 검색 목록 + 페이징
-	public Map<String, Object> blogListPaging(int crtPage, String keyword) {
-		System.out.println("BlogService.blogListPaging()");
-		System.out.println("crtPage : " + crtPage);
-		System.out.println("keyword : " + keyword);
+	public Map<String, Object> blogSearchList(String keyword, String kwdOpt, int crtPage) {
+		System.out.println("BlogService.blogSearchList()");
 
 		// 글목록 계산 //////////////////////////////
 		
-		int listCnt = 10;
+		int listCnt = 5;
 		crtPage = (crtPage > 0) ? crtPage : 1;
 		int startRNum = (crtPage-1) * listCnt + 1;
 		int endRNum = (startRNum + listCnt) - 1;
@@ -42,6 +40,7 @@ public class BlogService {
 		listMap.put("startRNum", startRNum);
 		listMap.put("endRNum", endRNum);
 		listMap.put("keyword", keyword);
+		listMap.put("kwdOpt", kwdOpt);
 		List<BlogVo> blogList = blogDao.blogListPaging(listMap);
 		
 		// 페이징 계산 //////////////////////////////
@@ -50,7 +49,7 @@ public class BlogService {
 		int endPageBtnNo = (int)Math.ceil(crtPage/(double)pageBtnCount)*pageBtnCount;
 		int startPageBtnNo = (endPageBtnNo-pageBtnCount)+1;
 		
-		// 전체 블로그갯수
+		// 전체 블로그갯수 + 검색
 		int totalCnt = blogDao.selectBlogCnt(keyword);
 		System.out.println("totalCnt : " + totalCnt);
 		

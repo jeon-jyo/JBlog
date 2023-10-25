@@ -29,6 +29,20 @@ public class BlogController {
 	
 	@Autowired
 	private BlogService blogService;
+
+	// 메인 + 블로그 검색 목록 + 페이징
+	@RequestMapping(value="/blog/search", method= { RequestMethod.GET, RequestMethod.POST})
+	public String blogSearch(@RequestParam(value="crtPage", required=false, defaultValue="1") int crtPage,
+			@RequestParam(value="keyword") String keyword, @RequestParam(value="kwdOpt") String kwdOpt, Model model) {
+		System.out.println("BlogController.blogSearch()");
+		System.out.println("keyword : " + keyword + ", kwdOpt : " + kwdOpt + ", crtPage : " + crtPage);
+
+		Map<String, Object> blogPageMap =  blogService.blogSearchList(keyword, kwdOpt, crtPage);
+		
+		model.addAttribute("blogPageMap", blogPageMap);
+		
+		return "main/index";
+	}	
 	
 	// 블로그 메인
 	@RequestMapping(value="/{id}", method= { RequestMethod.GET, RequestMethod.POST})
@@ -37,10 +51,7 @@ public class BlogController {
 			@RequestParam(value="postNo", required=false, defaultValue="0") int postNo,
 			@RequestParam(value="crtPage", required=false, defaultValue="1") int crtPage, Model model) {
 		System.out.println("BlogController.blogMain()");
-		System.out.println("id : " + id);
-		System.out.println("cateNo : " + cateNo);
-		System.out.println("postNo : " + postNo);
-		System.out.println("crtPage : " + crtPage);
+		System.out.println("id : " + id + ", cateNo : " + cateNo + ", postNo : " + postNo + ", crtPage : " + crtPage);
 		
 		BlogVo blogVo = blogService.blogDetail(id);
 		List<CategoryVo> categoryList = blogService.cateList(id);

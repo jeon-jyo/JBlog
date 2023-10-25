@@ -73,16 +73,21 @@
 			                  FROM blog b, users u
 			                 WHERE b.id = u.id
 		]]>
-		<if test='keyword != ""'>
+		<if test='kwdOpt == "optTitle"'>
 			<![CDATA[
 				  			   AND b.blogTitle LIKE '%'||#{keyword}||'%'
+			]]>
+		</if>
+		<if test='kwdOpt == "optName"'>
+			<![CDATA[
+				  			   AND u.userName LIKE '%'||#{keyword}||'%'
 			]]>
 		</if>
 		<![CDATA[
 			                 ORDER BY u.userno DESC) ot
 							       ) ort
-							 WHERE ort.rn >= #{startRNum}
-							   AND ort.rn <= #{endRNum}
+					WHERE ort.rn >= #{startRNum}
+					  AND ort.rn <= #{endRNum}
 		]]>
 	</select>
 	
@@ -91,12 +96,8 @@
 		<![CDATA[
 			SELECT COUNT(*) count
   			  FROM blog
+  			 WHERE blogTitle LIKE '%'||#{keyword}||'%'
 		]]>
-		<if test='value != ""'>
-			<![CDATA[
-				  WHERE blogTitle LIKE '%'||#{keyword}||'%'
-			]]>
-		</if>
 	</select>
 	
 	<!-- 블로그 생성 -->

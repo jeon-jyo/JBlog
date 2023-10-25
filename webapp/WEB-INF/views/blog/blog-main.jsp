@@ -123,30 +123,37 @@
 							<col style="width: 20%;">
 						</colgroup>
 						
-						<c:forEach items="${postPageMap.postList }" var="postVo">
+						<c:forEach items="${postPageMap.postList }" var="vo">
 	      					<tr>
-								<td class="text-left"><a href="${pageContext.request.contextPath }/${blogVo.id.id }?cateNo=${categoryVo.cateNo }&postNo=${postVo.postNo }">${postVo.postTitle }</a></td>
-								<td class="text-right">${postVo.regDate }</td>
+	      						<c:choose>
+									<c:when test="${vo.postNo == param.postNo }">
+										<td class="text-left"><a href="${pageContext.request.contextPath }/${blogVo.id.id }?cateNo=${postVo.cateNo.cateNo }&postNo=${vo.postNo }&crtPage=${param.crtPage }" style="font-weight: bold;">${vo.postTitle }</a></td>
+									</c:when>
+									<c:otherwise>
+										<td class="text-left"><a href="${pageContext.request.contextPath }/${blogVo.id.id }?cateNo=${postVo.cateNo.cateNo }&postNo=${vo.postNo }&crtPage=${param.crtPage }">${vo.postTitle }</a></td>
+									</c:otherwise>
+								</c:choose>
+								<td class="text-right">${vo.regDate }</td>
 							</tr>
 	      				</c:forEach>
 					</table>
 					<div id="paging">
 						<ul style="display: flex; justify-content: center;">
 							<c:if test="${postPageMap.prev }">
-								<li><a href="${pageContext.request.contextPath }/${blogVo.id.id }?cateNo=${categoryVo.cateNo }&crtPage=${postPageMap.startPageBtnNo - 1}">◀</a></li>
+								<li><a href="${pageContext.request.contextPath }/${blogVo.id.id }?cateNo=${postVo.cateNo.cateNo }&postNo=${postVo.postNo }&crtPage=${postPageMap.startPageBtnNo - 1}">◀</a></li>
 							</c:if>
 							<c:forEach begin="${postPageMap.startPageBtnNo }" end="${postPageMap.endPageBtnNo }" step="1" var="page">
 								<c:choose>
 									<c:when test="${param.crtPage == page }">
-										<li style="font-weight: bold;"><a href="${pageContext.request.contextPath }/${blogVo.id.id }?cateNo=${categoryVo.cateNo }&crtPage=${page}">${page }</a></li>
+										<li style="font-weight: bold;"><a href="${pageContext.request.contextPath }/${blogVo.id.id }?cateNo=${postVo.cateNo.cateNo }&postNo=${postVo.postNo }&crtPage=${page}">${page }</a></li>
 									</c:when>
 									<c:otherwise>
-										<li><a href="${pageContext.request.contextPath }/${blogVo.id.id }?cateNo=${categoryVo.cateNo }&crtPage=${page}">${page }</a></li>
+										<li><a href="${pageContext.request.contextPath }/${blogVo.id.id }?cateNo=${postVo.cateNo.cateNo }&postNo=${postVo.postNo }&crtPage=${page}">${page }</a></li>
 									</c:otherwise>
 								</c:choose>
 							</c:forEach>
 							<c:if test="${postPageMap.next }">
-								<li><a href="${pageContext.request.contextPath }/${blogVo.id.id }?cateNo=${categoryVo.cateNo }&crtPage=${postPageMap.endPageBtnNo + 1}">▶</a></li>
+								<li><a href="${pageContext.request.contextPath }/${blogVo.id.id }?cateNo=${postVo.cateNo.cateNo }&postNo=${postVo.postNo }&crtPage=${postPageMap.endPageBtnNo + 1}">▶</a></li>
 							</c:if>
 						</ul>
 						<div class="clear"></div>
