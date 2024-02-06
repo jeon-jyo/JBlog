@@ -42,7 +42,7 @@ public class BlogController {
 		model.addAttribute("blogPageMap", blogPageMap);
 		
 		return "main/index";
-	}	
+	}
 	
 	// 블로그 메인
 	@RequestMapping(value="/{id}", method= { RequestMethod.GET, RequestMethod.POST})
